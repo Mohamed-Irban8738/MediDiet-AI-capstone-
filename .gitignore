@@ -1,4 +1,5 @@
 node_modules/
+<<<<<<< HEAD
 build/
 dist/
 coverage/
@@ -6,3 +7,8 @@ coverage/
 *.log
 .env*
 !.env.example
+=======
+.env
+dist/
+.vite/
+>>>>>>> 21bfd60dc0b4d8d6e464925f035b5466d515631d

@@ -1,5 +1,6 @@
 export type NavView = "dashboard" | "patients" | "patient-detail" | "meal-planner" | "security" | "settings";
 
+<<<<<<< HEAD
 export type UserRole = "doctor" | "patient";
 
 export interface UserSession {
@@ -13,6 +14,8 @@ export interface UserSession {
   speciality?: string;
 }
 
+=======
+>>>>>>> 21bfd60dc0b4d8d6e464925f035b5466d515631d
 export type PlanStatus = "In-Treatment" | "Stable" | "Discharged" | "Pending Review";
 export type RiskLevel = "High" | "Moderate" | "Low";
 

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+<<<<<<< HEAD
 import { NavView, UserSession } from "../types";
 import { LogOut } from "lucide-react";
 
@@ -6,6 +7,13 @@ interface TopHeaderProps {
   currentView: NavView;
   session?: UserSession | null;
   onLogout?: () => void;
+=======
+import { MOCK_CLINICIAN } from "../data/mockData";
+import { NavView } from "../types";
+
+interface TopHeaderProps {
+  currentView: NavView;
+>>>>>>> 21bfd60dc0b4d8d6e464925f035b5466d515631d
   onMobileMenuToggle: () => void;
   onSearchChange?: (query: string) => void;
   onOpenNotifications?: () => void;
@@ -14,8 +22,11 @@ interface TopHeaderProps {
 
 export const TopHeader: React.FC<TopHeaderProps> = ({
   currentView,
+<<<<<<< HEAD
   session,
   onLogout,
+=======
+>>>>>>> 21bfd60dc0b4d8d6e464925f035b5466d515631d
   onMobileMenuToggle,
   onSearchChange,
   onOpenNotifications,
@@ -87,6 +98,7 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
         {/* Clinician Profile Avatar */}
         <div className="flex items-center gap-2 pl-2 border-l border-outline-variant/60">
           <img
+<<<<<<< HEAD
             src={session?.avatarUrl || "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=150&auto=format&fit=crop&q=80"}
             alt={session?.name || "Dr. Sarah Jenkins"}
             className="w-8 h-8 md:w-9 md:h-9 rounded-full object-cover border border-outline-variant"
@@ -107,8 +119,21 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
             <span className="hidden sm:inline">Logout</span>
           </button>
         )}
+=======
+            src={MOCK_CLINICIAN.avatarUrl}
+            alt={MOCK_CLINICIAN.name}
+            className="w-8 h-8 md:w-9 md:h-9 rounded-full object-cover border border-outline-variant"
+          />
+          <span className="font-body-sm text-body-sm font-semibold text-on-surface hidden lg:inline">
+            Dr. Sarah Jenkins
+          </span>
+        </div>
+>>>>>>> 21bfd60dc0b4d8d6e464925f035b5466d515631d
       </div>
     </header>
   );
 };
+<<<<<<< HEAD
 
+=======
+>>>>>>> 21bfd60dc0b4d8d6e464925f035b5466d515631d

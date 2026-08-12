@@ -33,6 +33,7 @@ app.get("/api/health", (_req, res) => {
   res.json({ status: "ok" });
 });
 
+<<<<<<< HEAD
 // Mock Database for Auth & Patient Sessions
 const MOCK_USERS = [
   {
@@ -311,6 +312,8 @@ app.post("/api/patient/send-message", (req, res) => {
   return res.json({ success: true, messages: patientData?.messages || [] });
 });
 
+=======
+>>>>>>> 21bfd60dc0b4d8d6e464925f035b5466d515631d
 // API: AI Meal Plan Generator
 app.post("/api/generate-meal-plan", async (req, res) => {
   try {

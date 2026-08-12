@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 import React, { useState, useEffect } from "react";
 import { NavView, Patient, UserSession } from "./types";
+=======
+import React, { useState } from "react";
+import { NavView, Patient } from "./types";
+>>>>>>> 21bfd60dc0b4d8d6e464925f035b5466d515631d
 import { INITIAL_PATIENTS } from "./data/mockData";
 import { Sidebar } from "./components/Sidebar";
 import { TopHeader } from "./components/TopHeader";
@@ -10,6 +15,7 @@ import { MealPlannerView } from "./components/MealPlannerView";
 import { SecurityView } from "./components/SecurityView";
 import { SettingsView } from "./components/SettingsView";
 import { NewConsultationModal } from "./components/NewConsultationModal";
+<<<<<<< HEAD
 import { LoginView } from "./components/LoginView";
 import { PatientPortalView } from "./components/PatientPortalView";
 
@@ -34,12 +40,17 @@ export function App() {
     };
   });
 
+=======
+
+export function App() {
+>>>>>>> 21bfd60dc0b4d8d6e464925f035b5466d515631d
   const [currentView, setCurrentView] = useState<NavView>("dashboard");
   const [selectedPatientId, setSelectedPatientId] = useState<string>("PT-8842-X");
   const [patients, setPatients] = useState<Patient[]>(INITIAL_PATIENTS);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isConsultationModalOpen, setIsConsultationModalOpen] = useState(false);
 
+<<<<<<< HEAD
   // Sync session changes to localStorage
   useEffect(() => {
     if (userSession) {
@@ -59,6 +70,8 @@ export function App() {
     localStorage.removeItem("medidiet_user_session");
   };
 
+=======
+>>>>>>> 21bfd60dc0b4d8d6e464925f035b5466d515631d
   // Selected patient object
   const selectedPatient =
     patients.find((p) => p.id === selectedPatientId) || patients[0];
@@ -101,6 +114,7 @@ export function App() {
     );
   };
 
+<<<<<<< HEAD
   // 1. Unauthenticated View -> Show Login Screen
   if (!userSession) {
     return <LoginView onLoginSuccess={handleLoginSuccess} />;
@@ -112,6 +126,8 @@ export function App() {
   }
 
   // 3. Doctor Logged In View -> Show Full Doctor / Clinician Workstation
+=======
+>>>>>>> 21bfd60dc0b4d8d6e464925f035b5466d515631d
   return (
     <div className="bg-background dark:bg-surface-dim text-on-surface font-body-md min-h-screen flex selection:bg-secondary-container selection:text-on-secondary-container">
       {/* Fixed Desktop Sidebar */}
@@ -147,8 +163,11 @@ export function App() {
       <div className="flex-1 flex flex-col md:pl-64 min-w-0">
         <TopHeader
           currentView={currentView}
+<<<<<<< HEAD
           session={userSession}
           onLogout={handleLogout}
+=======
+>>>>>>> 21bfd60dc0b4d8d6e464925f035b5466d515631d
           onMobileMenuToggle={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           onOpenNotifications={() => setCurrentView("security")}
           onOpenHelp={() => setCurrentView("settings")}
