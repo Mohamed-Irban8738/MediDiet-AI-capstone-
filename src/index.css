@@ -1,0 +1,108 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --background: #f8f9ff;
+    --on-background: #0b1c30;
+    --surface: #f8f9ff;
+    --surface-dim: #cbdbf5;
+    --surface-bright: #f8f9ff;
+    --surface-container-lowest: #ffffff;
+    --surface-container-low: #eff4ff;
+    --surface-container: #e5eeff;
+    --surface-container-high: #dce9ff;
+    --surface-container-highest: #d3e4fe;
+    --on-surface: #0b1c30;
+    --on-surface-variant: #424752;
+    --outline: #727783;
+    --outline-variant: #c2c6d4;
+    --primary: #00478d;
+    --on-primary: #ffffff;
+    --primary-container: #005eb8;
+    --on-primary-container: #c8daff;
+    --secondary: #3f6833;
+    --on-secondary: #ffffff;
+    --secondary-container: #bdedaa;
+    --on-secondary-container: #436d37;
+    --secondary-fixed-dim: #a4d393;
+    --error: #ba1a1a;
+    --error-container: #ffdad6;
+    --on-error-container: #93000a;
+  }
+}
+
+@theme {
+  --color-background: var(--background);
+  --color-on-background: var(--on-background);
+  --color-surface: var(--surface);
+  --color-surface-dim: var(--surface-dim);
+  --color-surface-bright: var(--surface-bright);
+  --color-surface-container-lowest: var(--surface-container-lowest);
+  --color-surface-container-low: var(--surface-container-low);
+  --color-surface-container: var(--surface-container);
+  --color-surface-container-high: var(--surface-container-high);
+  --color-surface-container-highest: var(--surface-container-highest);
+  --color-on-surface: var(--on-surface);
+  --color-on-surface-variant: var(--on-surface-variant);
+  --color-outline: var(--outline);
+  --color-outline-variant: var(--outline-variant);
+  --color-primary: var(--primary);
+  --color-on-primary: var(--on-primary);
+  --color-primary-container: var(--primary-container);
+  --color-on-primary-container: var(--on-primary-container);
+  --color-secondary: var(--secondary);
+  --color-on-secondary: var(--on-secondary);
+  --color-secondary-container: var(--secondary-container);
+  --color-on-secondary-container: var(--on-secondary-container);
+  --color-secondary-fixed-dim: var(--secondary-fixed-dim);
+  --color-error: var(--error);
+  --color-error-container: var(--error-container);
+  --color-on-error-container: var(--on-error-container);
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #f8f9ff;
+  color: #0b1c30;
+}
+
+.shadow-soft {
+  box-shadow: 0px 4px 12px rgba(0, 94, 184, 0.08);
+}
+
+.chart-grid {
+  stroke: #E2E8F0;
+  stroke-width: 1;
+  stroke-dasharray: 4;
+}
+
+.chart-line {
+  stroke: #005eb8;
+  stroke-width: 2;
+  fill: none;
+}
+
+.chart-area {
+  fill: rgba(0, 94, 184, 0.1);
+}
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+.material-symbols-outlined.fill {
+  font-variation-settings: 'FILL' 1;
+}
+
+/* Custom scrollbar for clean data tables */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #c2c6d4;
+  border-radius: 9999px;
+}
+
