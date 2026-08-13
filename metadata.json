@@ -1,0 +1,6 @@
+{
+  "name": "MediDiet AI",
+  "description": "Clinical Nutrition Portal for dietitians to manage active patients, clinical overviews, AI meal plan generation, adherence trends, and consultation workflows.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

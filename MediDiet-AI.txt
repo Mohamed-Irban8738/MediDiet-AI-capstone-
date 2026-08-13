@@ -1,0 +1,80 @@
+Full Execution & Architecture Guide for MediDiet AI
+MediDiet AI is built as a full-stack web application combining a Python backend HTTP server with a React SPA (Single Page Application) frontend powered by Vite and Tailwind CSS.
+1. High-Level Architecture Overview
+code
+Code
+                           _______________________________________________________
+                          |                                                       |
+                          |             Browser (Client)                          |
+                          |   React 19 + Lucide Icons + Tailwind                  |
+                          |_______________________________________________________|
+                                             	     │
+                                    HTTP Requests (Port 3000)
+                                                     │
+                          ┌───────────────────V─────────────────────┐
+                          │     Python Server (server.py)           │
+                          │      http.server on 0.0.0.0:3000        │
+                          └─────────┬─────────────────────┬─────────┘
+                                    │                     │
+                    ┌───────────────┴────────┐   ┌────────┴──────────────┐
+                    │ API Request Handler    │   │ Static SPA File Server│
+                    │ - /api/auth/login      │   │ - Serves dist/*.js    │
+                    │ - /api/patient/*       │   │ - Serves dist/*.css   │
+                    │ - /api/generate-meal.. │   │ - Fallback index.html │
+                    └───────────────┬────────┘   └───────────────────────┘
+                                    │
+                         ┌──────────V──────────┐
+                         │  Google Gemini API  │
+                         │ (gemini-2.5-flash)  │
+                         └─────────────────────┘
+2. Server & Build Process Execution
+Step 1: Frontend Build Phase
+When running npm run build or booting the application:
+Vite compiles all React JSX source files located in /src (App.jsx, main.jsx, src/components/*.jsx).
+Tailwind CSS v4 scans utility classes and compiles them into optimized CSS bundles (dist/assets/index-*.css).
+Output static files are placed in the /dist directory (dist/index.html, JavaScript chunks, and CSS assets).
+Step 2: Python Backend Startup
+When npm start or python3 server.py is invoked:
+server.py initializes on host 0.0.0.0 and port 3000.
+Auto-Build Guard (build_frontend()): Checks if dist/index.html exists. If missing, it triggers npx vite build automatically before starting the listener.
+Initializes the in-memory Python database store (MOCK_USERS and patient_portal_store).
+Begins listening for incoming HTTP connections via MediDietHTTPRequestHandler.
+
+3. Request Routing Execution Flow
+The Python server handles two categories of incoming requests:
+A. API Request Flow (/api/*)
+POST /api/auth/login: Accepts { email, password, role }. Validates credentials against Python user store and returns user session tokens and role metadata (doctor or patient).
+POST /api/generate-meal-plan:
+Parses patient clinical parameters (allergies, medical conditions, target calories, dietary preferences).
+If GEMINI_API_KEY is configured in environment variables, sends a direct server-to-server request to Gemini 2.5 Flash (generativelanguage.googleapis.com) to generate a structured 1-day Medical Nutrition Therapy plan.
+If API keys are absent or timed out, gracefully returns an enriched, clinical therapeutic fallback meal plan.
+GET /api/patient/portal/:id: Retrieves current calorie counts, macronutrient ratios, active schedule, weight trend history, and doctor messages for a patient.
+POST /api/patient/toggle-meal: Toggles completion status of a scheduled meal, updating calorie consumption calculations in real-time.
+POST /api/patient/log-weight: Appends a new weight measurement entry to the patient's longitudinal history log.
+POST /api/patient/send-message: Appends a message to the direct messaging thread between dietitian and patient.
+B. Static Asset & SPA Routing
+For static resource requests (.js, .css, images), server.py locates and streams the file from /dist with the appropriate MIME types (application/javascript, text/css).
+For non-API HTML navigation routes (e.g. /patients, /meal-planner), server.py returns dist/index.html, allowing React Router / client-side state in App.jsx to render the view.
+
+4. Client-Side Rendering Execution (React App)
+Boot: index.html loads src/main.jsx, mounting the <App /> component inside #root.
+Session State:
+Unauthenticated users see LoginView with options to log in as a Clinician or Patient.
+Logging in calls /api/auth/login and sets session state in React.
+Role-Based Portals:
+Doctor Portal (role: 'doctor'): Renders layout with Sidebar, TopHeader, and switches active views between:
+DashboardView: Clinical metrics, risk badges, recent patient activity, and quick AI prompts.
+PatientsView: Patient directory, search/filtering by risk level & status, and patient creation modal.
+PatientProfileView: Patient identity, allergies, chronic conditions, daily calorie meters, and weight charts.
+MealPlannerView: Interactive AI Meal Generator connected to /api/generate-meal-plan.
+NewConsultationModal: Quick consultation logging modal.
+SecurityView: HIPAA & PII compliance telemetry logs.
+SettingsView: Practitioner preferences and clinic configuration.
+Patient Portal (role: 'patient'): Renders PatientPortalView:
+Displays prescribed diet plan, progress ring, macronutrient progress bars, interactive meal checklist, weight log form, and live chat thread with the dietitian.
+
+5. Development & Startup Commands
+Command	Action
+npm run dev	Starts python3 server.py (which builds frontend if missing and hosts backend on port 3000)
+npm run build	Bundles React application into production static files in /dist
+npm start	Runs production server (python3 server.py)
