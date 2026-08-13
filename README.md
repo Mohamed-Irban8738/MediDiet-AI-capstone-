@@ -1,3 +1,5 @@
+#project  Title: Diet & Nutrition Planning SaaS for Clinics
+
 # 🥗 MediDiet AI
 
 ### AI-Powered Diet & Nutrition Management SaaS for Clinics
