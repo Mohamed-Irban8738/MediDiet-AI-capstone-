@@ -1,0 +1,21 @@
+services:
+  db:
+    image: postgres:16
+    container_name: medidiet-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: medidiet
+      POSTGRES_USER: medidiet
+      POSTGRES_PASSWORD: punas
+    ports:
+      - "5432:5432"
+    volumes:
+      - medidiet_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U medidiet -d medidiet"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  medidiet_pgdata:
