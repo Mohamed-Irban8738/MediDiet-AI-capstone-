@@ -1,10 +1,23 @@
+# Backend - Python
 backend/.venv/
+backend/venv/
 backend/.env
 backend/__pycache__/
 backend/**/*.pyc
+backend/.pytest_cache/
+
+# Frontend - Node
 frontend/node_modules/
 frontend/dist/
 frontend/.env
+
+# IDE / Editor
 .vscode/
 .idea/
+
+# Claude local settings
+.claude/settings.local.json
+
+# OS
 .DS_Store
+Thumbs.db
