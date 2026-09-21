@@ -1,39 +1,43 @@
 from datetime import datetime, timedelta, timezone
 
+import bcrypt
 from jose import jwt
-from passlib.context import CryptContext
 
 from app.core.config import settings
 
 
-pwd_context = CryptContext(
-    schemes=["bcrypt"],
-    deprecated="auto",
-)
-
-
 def hash_password(password: str) -> str:
-    return pwd_context.hash(password)
+    password_bytes = password.encode("utf-8")
+
+    if len(password_bytes) > 72:
+        raise ValueError("Password cannot exceed 72 bytes")
+
+    return bcrypt.hashpw(
+        password_bytes,
+        bcrypt.gensalt(),
+    ).decode("utf-8")
 
 
-def verify_password(
-    plain_password: str,
-    hashed_password: str,
-) -> bool:
-    return pwd_context.verify(
-        plain_password,
-        hashed_password,
+def verify_password(password: str, password_hash: str) -> bool:
+    password_bytes = password.encode("utf-8")
+
+    if len(password_bytes) > 72:
+        return False
+
+    return bcrypt.checkpw(
+        password_bytes,
+        password_hash.encode("utf-8"),
     )
 
 
 def create_access_token(user_id: int) -> str:
-    expires_at = datetime.now(timezone.utc) + timedelta(
+    expire = datetime.now(timezone.utc) + timedelta(
         minutes=settings.access_token_expire_minutes
     )
 
     payload = {
         "sub": str(user_id),
-        "exp": expires_at,
+        "exp": expire,
     }
 
     return jwt.encode(
