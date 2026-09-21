@@ -20,35 +20,27 @@ You are assisting a qualified doctor.
 Create a practical 7-day vegetarian diet plan based ONLY on the information provided.
 
 IMPORTANT RULES:
-- Return ONLY ONE JSON OBJECT.
-- Do NOT return a meal object by itself.
-- Do NOT return a day object by itself.
-- The JSON root object MUST contain exactly these main fields:
-  "name"
-  "goal"
-  "daily_calories"
-  "notes"
-  "days"
-- "days" MUST be an array containing exactly 7 day objects.
-- Each day object MUST contain:
-  "day_number"
-  "meals"
-- Each day MUST contain exactly 3 meals.
-- Each meal MUST contain:
-  "name"
-  "meal_type"
-  "day_number"
-  "description"
-  "calories"
-  "protein_g"
-  "carbohydrates_g"
-  "fat_g"
-  "serving_size"
-  "scheduled_time"
-- meal_type MUST be one of:
-  "breakfast", "lunch", "dinner"
-- day_number MUST match the day containing the meal.
+- Return ONLY ONE VALID JSON OBJECT.
+- The root object MUST contain: name, goal, daily_calories, notes, days.
+- Do NOT return markdown.
+- Do NOT use ``` fences.
+- Do NOT include any text before or after the JSON.
+- Use double quotes for all JSON keys and string values.
+- All strings MUST be properly closed.
+- All arrays and objects MUST be properly closed.
+- Do not use trailing commas.
+- Do not use comments.
+- Do not use single quotes.
+- Do not include newline characters inside JSON string values.
+- The "days" array MUST contain exactly 7 day objects.
 - Day numbers MUST be exactly 1, 2, 3, 4, 5, 6, 7.
+- Each day MUST contain exactly 3 meals.
+- Each meal MUST contain the fields:
+  name, meal_type, day_number, description, calories,
+  protein_g, carbohydrates_g, fat_g, serving_size, scheduled_time.
+- meal_type MUST be exactly one of:
+  breakfast, lunch, dinner.
+- Each meal's day_number MUST match its parent day.
 - Do not invent medical conditions.
 - Do not prescribe medication.
 - Respect allergies.
@@ -56,11 +48,8 @@ IMPORTANT RULES:
 - Use realistic Indian vegetarian meals where appropriate.
 - Use concise descriptions.
 - Use approximate nutritional values.
-- Do not include markdown.
-- Do not include ``` fences.
-- Do not include explanations outside the JSON object.
 
-The required structure is:
+REQUIRED JSON STRUCTURE:
 
 {{
   "name": "7-Day Vegetarian Diet Plan",
@@ -75,7 +64,7 @@ The required structure is:
           "name": "Vegetable Upma",
           "meal_type": "breakfast",
           "day_number": 1,
-          "description": "Vegetable semolina upma with vegetables.",
+          "description": "Vegetable semolina upma with mixed vegetables.",
           "calories": 300,
           "protein_g": 8,
           "carbohydrates_g": 45,
@@ -112,8 +101,10 @@ The required structure is:
   ]
 }}
 
-The example above only demonstrates the structure.
+The structure above is only an example.
+
 You MUST generate all 7 days.
+You MUST generate exactly 3 meals for every day.
 
 PATIENT INFORMATION
 -------------------
@@ -127,43 +118,141 @@ EXISTING AI NUTRITION ASSESSMENT
 --------------------------------
 {ai_assessment}
 
-Now generate the complete 7-day diet plan.
+Generate the complete 7-day diet plan now.
 
-Remember:
-THE ROOT MUST BE A DIET PLAN OBJECT.
-THE ROOT MUST HAVE "name" AND "days".
-THE "days" ARRAY MUST CONTAIN 7 DAYS.
-EACH DAY MUST CONTAIN 3 MEALS.
-RETURN ONLY JSON.
+FINAL REQUIREMENT:
+Return ONLY valid JSON.
 """
 
         json_schema = AIDietPlan.model_json_schema()
+
+        async def clean_response(response: str) -> str:
+            cleaned = response.strip()
+
+            if cleaned.startswith("```"):
+                lines = cleaned.splitlines()
+
+                if lines and lines[0].strip().startswith("```"):
+                    lines = lines[1:]
+
+                if lines and lines[-1].strip() == "```":
+                    lines = lines[:-1]
+
+                cleaned = "\n".join(lines).strip()
+
+            return cleaned
+
+        # --------------------------------------------------
+        # First AI request
+        # --------------------------------------------------
 
         response = await ollama.generate(
             prompt,
             format=json_schema,
         )
 
-        cleaned = response.strip()
+        cleaned = await clean_response(response)
 
-        if cleaned.startswith("```"):
-            lines = cleaned.splitlines()
-
-            if lines and lines[0].strip().startswith("```"):
-                lines = lines[1:]
-
-            if lines and lines[-1].strip() == "```":
-                lines = lines[:-1]
-
-            cleaned = "\n".join(lines).strip()
+        # --------------------------------------------------
+        # Parse first response
+        # --------------------------------------------------
 
         try:
             data = json.loads(cleaned)
 
-        except json.JSONDecodeError as exc:
-            raise ValueError(
-                f"AI returned invalid JSON: {exc}"
-            ) from exc
+        except json.JSONDecodeError:
+            # --------------------------------------------------
+            # Retry once with a strict JSON repair prompt
+            # --------------------------------------------------
+
+            retry_prompt = f"""
+You previously generated an invalid JSON response.
+
+Generate the complete 7-day vegetarian diet plan again.
+
+CRITICAL JSON RULES:
+- Return ONLY ONE JSON OBJECT.
+- No markdown.
+- No ``` fences.
+- No explanations.
+- No comments.
+- Use double quotes only.
+- Every string must have a closing double quote.
+- Every object must have matching {{ and }}.
+- Every array must have matching [ and ].
+- No trailing commas.
+- Do not put line breaks inside string values.
+
+ROOT OBJECT:
+{{
+  "name": "7-Day Vegetarian Diet Plan",
+  "goal": "Dietary management and balanced nutrition",
+  "daily_calories": 1800,
+  "notes": "General dietary guidance for doctor review.",
+  "days": []
+}}
+
+The "days" array MUST contain exactly 7 objects.
+
+Each day MUST have:
+- day_number
+- meals
+
+Each day MUST contain exactly 3 meals.
+
+Each meal MUST have:
+- name
+- meal_type
+- day_number
+- description
+- calories
+- protein_g
+- carbohydrates_g
+- fat_g
+- serving_size
+- scheduled_time
+
+meal_type must be:
+breakfast, lunch, or dinner.
+
+Day numbers must be:
+1, 2, 3, 4, 5, 6, 7.
+
+The meal day_number must match the parent day.
+
+PATIENT INFORMATION
+-------------------
+{patient_context}
+
+CONSULTATION INFORMATION
+------------------------
+{consultation_context}
+
+EXISTING AI NUTRITION ASSESSMENT
+--------------------------------
+{ai_assessment}
+
+RETURN ONLY THE COMPLETE VALID JSON OBJECT.
+"""
+
+            retry_response = await ollama.generate(
+                retry_prompt,
+                format=json_schema,
+            )
+
+            cleaned = await clean_response(retry_response)
+
+            try:
+                data = json.loads(cleaned)
+
+            except json.JSONDecodeError as exc:
+                raise ValueError(
+                    f"AI returned invalid JSON after retry: {exc}"
+                ) from exc
+
+        # --------------------------------------------------
+        # Pydantic validation
+        # --------------------------------------------------
 
         try:
             diet = AIDietPlan.model_validate(data)
@@ -173,10 +262,18 @@ RETURN ONLY JSON.
                 f"AI returned data that failed validation: {exc}"
             ) from exc
 
+        # --------------------------------------------------
+        # Verify exactly 7 days
+        # --------------------------------------------------
+
         if len(diet.days) != 7:
             raise ValueError(
                 f"AI returned {len(diet.days)} days instead of exactly 7"
             )
+
+        # --------------------------------------------------
+        # Verify day numbers
+        # --------------------------------------------------
 
         day_numbers = sorted(
             day.day_number
@@ -187,6 +284,10 @@ RETURN ONLY JSON.
             raise ValueError(
                 f"Invalid day numbers returned by AI: {day_numbers}"
             )
+
+        # --------------------------------------------------
+        # Verify exactly 3 meals per day
+        # --------------------------------------------------
 
         for day in diet.days:
 
@@ -201,7 +302,11 @@ RETURN ONLY JSON.
                 for meal in day.meals
             }
 
-            if meal_types != {"breakfast", "lunch", "dinner"}:
+            if meal_types != {
+                "breakfast",
+                "lunch",
+                "dinner",
+            }:
                 raise ValueError(
                     f"Day {day.day_number} must contain "
                     "breakfast, lunch, and dinner"
